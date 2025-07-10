@@ -22,9 +22,6 @@ A Salesforce-based CRM to automate vehicle order management, stock availability 
 - `test-data/` – Test cases, screenshots
 - `video-demo/` – Link to your demo video
 
-## 🎥 Demo Video
-🔗 [Demo Video on Google Drive](<YOUR-VIDEO-LINK>) *(Unlisted)*
-
 ## 🚀 Tech Stack
 - Salesforce CRM
 - Apex Programming

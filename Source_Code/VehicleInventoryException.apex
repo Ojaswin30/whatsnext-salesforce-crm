@@ -1,1 +1,1 @@
-public class VehicleInventoryException extends Exception {}
+public inherited sharing class VehicleInventoryException extends Exception {}

@@ -4,7 +4,7 @@
  * @group WhatsNext CRM Tests
  */
 @isTest
-public class VehicleTestDataFactory {
+public inherited sharing class VehicleTestDataFactory {
 
     public static Vehicle_Dealer__c createDealer(String name, String location) {
         Vehicle_Dealer__c dealer = new Vehicle_Dealer__c(
@@ -62,5 +62,20 @@ public class VehicleTestDataFactory {
             ));
         }
         return orders;
+    }
+
+    @isTest
+    static void testFactorySanity() {
+        Vehicle_Dealer__c dealer = createDealer('Sanity Dealer', 'Mumbai');
+        Assert.isNotNull(dealer.Id, 'Dealer should be created with a valid Id.');
+
+        Vehicle_Customer__c customer = createCustomer('Sanity Customer', 'sanity@whatsnext.com');
+        Assert.isNotNull(customer.Id, 'Customer should be created with a valid Id.');
+
+        Vehicle__c vehicle = createVehicle('Sanity EV', 'EV', 5, 1000000, dealer.Id);
+        Assert.isNotNull(vehicle.Id, 'Vehicle should be created with a valid Id.');
+
+        Vehicle_Order__c order = createOrder(customer.Id, vehicle.Id, VehicleInventoryService.STATUS_PENDING);
+        Assert.areEqual(VehicleInventoryService.STATUS_PENDING, order.Status__c, 'Order status should be Pending.');
     }
 }

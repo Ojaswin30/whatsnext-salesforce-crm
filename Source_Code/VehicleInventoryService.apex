@@ -148,6 +148,9 @@ public with sharing class VehicleInventoryService {
         Set<Id> vehicleIds = new Set<Id>();
 
         for (Vehicle_Order__c newOrder : newOrders) {
+            if (!oldOrdersMap.containsKey(newOrder.Id)) {
+                continue;
+            }
             Vehicle_Order__c oldOrder = oldOrdersMap.get(newOrder.Id);
             if (oldOrder == null) {
                 continue;

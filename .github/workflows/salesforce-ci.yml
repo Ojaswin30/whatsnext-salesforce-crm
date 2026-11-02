@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Salesforce Code Analyzer Plugin
         run: |
-          sf plugins install @salesforce/sfdx-scanner
+          echo 'y' | sf plugins install @salesforce/sfdx-scanner
 
       - name: Validate XML Metadata Well-Formedness
         run: |

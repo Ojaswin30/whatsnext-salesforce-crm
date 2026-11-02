@@ -15,20 +15,6 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js Runtime
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Salesforce CLI
-        run: |
-          npm install -g @salesforce/cli
-          sf --version
-
-      - name: Install Salesforce Code Analyzer Plugin
-        run: |
-          echo 'y' | sf plugins install @salesforce/sfdx-scanner
-
       - name: Validate XML Metadata Well-Formedness
         run: |
           python3 -c "
@@ -50,19 +36,27 @@ jobs:
           print('All XML metadata files verified well-formed.')
           "
 
-      - name: Run Salesforce Code Analyzer (PMD Rules)
-        run: |
-          sf scanner run \
-            --target "force-app/main/default/classes" \
-            --pmdconfig "config/pmd-ruleset.xml" \
-            --severity-threshold 2 \
-            --format table
+      - name: Set up Java Runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run PMD Static Analysis
+        uses: pmd/pmd-github-action@v2
+        id: pmd
+        with:
+          version: '6.55.0'
+          rulesets: 'config/pmd-ruleset.xml'
+          sourcePath: 'force-app/main/default/classes'
+          analyzeModifiedFilesOnly: false
 
       - name: Authenticate and Run Org Validation Deployment (if secret present)
         env:
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
         if: env.SFDX_AUTH_URL != ''
         run: |
+          npm install -g @salesforce/cli
           echo "${SFDX_AUTH_URL}" > ./auth_file.txt
           sf org login sfdx-url --sfdx-url-file ./auth_file.txt --set-default
           rm -f ./auth_file.txt

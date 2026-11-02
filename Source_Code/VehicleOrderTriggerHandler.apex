@@ -1,64 +1,67 @@
-public class VehicleOrderTriggerHandler {
- 
-    public static void handleTrigger(List<Vehicle_Order__c> newOrders, Map<Id, Vehicle_Order__c> oldOrders, Boolean isBefore, Boolean isAfter, Boolean isInsert, Boolean isUpdate) {
-        if (isBefore && (isInsert || isUpdate)) {
-            preventOrderIfOutOfStock(newOrders);
-        }
- 
-        if (isAfter && (isInsert || isUpdate)) {
-            updateStockOnOrderPlacement(newOrders);
-        }
-    }
- 
-    // ❌ Prevent placing an order if stock is zero
-    private static void preventOrderIfOutOfStock(List<Vehicle_Order__c> orders) {
-        Set<Id> vehicleIds = new Set<Id>();
-        for (Vehicle_Order__c order : orders) {
-            if (order.Vehicle__c != null) {
-                vehicleIds.add(order.Vehicle__c);
+/**
+ * @description Enterprise Trigger Handler for Vehicle_Order__c.
+ *              Separates concerns, routes trigger context events, and delegates
+ *              inventory transactions to VehicleInventoryService.
+ * @group WhatsNext CRM
+ */
+public with sharing class VehicleOrderTriggerHandler {
+
+    public static void handleTrigger(
+        List<Vehicle_Order__c> newOrders,
+        Map<Id, Vehicle_Order__c> oldOrders,
+        Boolean isBefore,
+        Boolean isAfter,
+        Boolean isInsert,
+        Boolean isUpdate
+    ) {
+        if (isBefore) {
+            if (isInsert) {
+                beforeInsert(newOrders);
+            } else if (isUpdate) {
+                beforeUpdate(newOrders, oldOrders);
             }
-        }
- 
-        if (!vehicleIds.isEmpty()) {
-            Map<Id, Vehicle__c> vehicleStockMap = new Map<Id, Vehicle__c>(
-                [SELECT Id, Stock_Quantity__c FROM Vehicle__c WHERE Id IN :vehicleIds]
-            );
- 
-            for (Vehicle_Order__c order : orders) {
-                Vehicle__c vehicle = vehicleStockMap.get(order.Vehicle__c);
-                if (vehicle != null && vehicle.Stock_Quantity__c <= 0) {
-                    order.addError('This vehicle is out of stock. Order cannot be placed.');
-                }
+        } else if (isAfter) {
+            if (isInsert) {
+                afterInsert(newOrders);
+            } else if (isUpdate) {
+                afterUpdate(newOrders, oldOrders);
             }
         }
     }
- 
-    // ✅ Decrease stock when an order is confirmed
-    private static void updateStockOnOrderPlacement(List<Vehicle_Order__c> orders) {
-        Set<Id> vehicleIds = new Set<Id>();
-        for (Vehicle_Order__c order : orders) {
-            if (order.Vehicle__c != null && order.Status__c == 'Confirmed') {
-                vehicleIds.add(order.Vehicle__c);
+
+    public static void beforeInsert(List<Vehicle_Order__c> newOrders) {
+        if (newOrders == null) {
+            return;
+        }
+
+        for (Vehicle_Order__c order : newOrders) {
+            if (order.Order_Date__c == null) {
+                order.Order_Date__c = Date.today();
+            }
+            if (order.Status__c == null) {
+                order.Status__c = VehicleInventoryService.STATUS_PENDING;
             }
         }
- 
-        if (!vehicleIds.isEmpty()) {
-            Map<Id, Vehicle__c> vehicleStockMap = new Map<Id, Vehicle__c>(
-                [SELECT Id, Stock_Quantity__c FROM Vehicle__c WHERE Id IN :vehicleIds]
-            );
- 
-            List<Vehicle__c> vehiclesToUpdate = new List<Vehicle__c>();
-            for (Vehicle_Order__c order : orders) {
-                Vehicle__c vehicle = vehicleStockMap.get(order.Vehicle__c);
-                if (vehicle != null && vehicle.Stock_Quantity__c > 0) {
-                    vehicle.Stock_Quantity__c -= 1;
-                    vehiclesToUpdate.add(vehicle);
-                }
-            }
- 
-            if (!vehiclesToUpdate.isEmpty()) {
-                update vehiclesToUpdate;
+    }
+
+    public static void beforeUpdate(List<Vehicle_Order__c> newOrders, Map<Id, Vehicle_Order__c> oldOrdersMap) {
+        if (newOrders == null) {
+            return;
+        }
+
+        for (Vehicle_Order__c order : newOrders) {
+            if (VehicleInventoryService.isConfirmedStatus(order.Status__c) && order.Vehicle__c == null) {
+                order.addError('A valid Vehicle reference is required to maintain a Confirmed order.');
             }
         }
+    }
+
+    public static void afterInsert(List<Vehicle_Order__c> newOrders) {
+        VehicleInventoryService.validateAndDeductInventory(newOrders, null);
+    }
+
+    public static void afterUpdate(List<Vehicle_Order__c> newOrders, Map<Id, Vehicle_Order__c> oldOrdersMap) {
+        VehicleInventoryService.validateAndDeductInventory(newOrders, oldOrdersMap);
+        VehicleInventoryService.restoreInventoryOnCancellation(newOrders, oldOrdersMap);
     }
 }

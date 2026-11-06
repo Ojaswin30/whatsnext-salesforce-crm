@@ -1,0 +1,76 @@
+<template>
+    <lightning-card title="Dealer Operations & Stock Performance" icon-name="standard:account">
+        <div slot="actions">
+            <span class="slds-badge slds-badge_lightest">{dealersCount} Active Dealerships</span>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Loading Spinner -->
+            <template lwc:if={isLoading}>
+                <div class="slds-is-relative slds-p-vertical_large">
+                    <lightning-spinner alternative-text="Loading dealer performance..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Dealers Table -->
+            <template lwc:if={hasDealers}>
+                <div class="slds-table_header-hidden">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col"><div class="slds-truncate" title="Dealer">Dealership</div></th>
+                                <th scope="col"><div class="slds-truncate" title="Location">Location</div></th>
+                                <th scope="col"><div class="slds-truncate" title="Models">Models</div></th>
+                                <th scope="col"><div class="slds-truncate" title="Stock Units">In Stock</div></th>
+                                <th scope="col"><div class="slds-truncate" title="Orders">Orders</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={dealersList} for:item="dealer">
+                                <tr key={dealer.dealerId}>
+                                    <th scope="row">
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <span class="dealer-title slds-truncate font-bold slds-m-right_x-small">
+                                                {dealer.dealerName}
+                                            </span>
+                                            <span class="slds-badge slds-badge_lightest">{dealer.dealerCode}</span>
+                                        </div>
+                                        <div class="slds-text-body_small slds-text-color_weak slds-m-top_xxx-small">
+                                            {dealer.email}
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <div class="slds-truncate">
+                                            <lightning-icon icon-name="utility:checkin" size="xx-small" class="slds-m-right_xxx-small"></lightning-icon>
+                                            {dealer.location}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate font-semibold">{dealer.totalVehicles}</div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate">
+                                            <span class="slds-badge slds-theme_success">{dealer.totalStockUnits} units</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate font-semibold text-primary">{dealer.totalOrders}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template lwc:if={showEmptyState}>
+                <div class="slds-text-align_center slds-p-vertical_large">
+                    <lightning-icon icon-name="utility:company" size="medium" alternative-text="No Dealers"></lightning-icon>
+                    <p class="slds-text-heading_small slds-m-top_small">No dealerships registered.</p>
+                    <p class="slds-text-color_weak">Register dealer partners to monitor geographic inventory and performance.</p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

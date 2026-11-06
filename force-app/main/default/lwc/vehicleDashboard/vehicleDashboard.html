@@ -1,0 +1,150 @@
+<template>
+    <div class="dashboard-wrapper slds-p-around_medium">
+        <!-- Dashboard Header -->
+        <div class="slds-page-header slds-page-header_record-home slds-m-bottom_medium header-container">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon 
+                                icon-name="standard:dashboard" 
+                                alternative-text="Dashboard" 
+                                size="medium">
+                            </lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate main-title font-bold" title="WhatsNext Vision Motors">
+                                            WhatsNext Vision Motors
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="slds-page-header__name-meta sub-title">
+                                Dealership operations dashboard — proposed design
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__controls">
+                        <div class="slds-page-header__control">
+                            <lightning-button 
+                                label="Refresh Metrics" 
+                                icon-name="utility:refresh" 
+                                variant="neutral" 
+                                onclick={handleRefresh}
+                                disabled={isLoading}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Spinner -->
+        <template lwc:if={isLoading}>
+            <div class="slds-is-relative slds-p-vertical_large spinner-box">
+                <lightning-spinner alternative-text="Loading operations data..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Metric Summary Cards (Step 12 proposed design) -->
+        <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+            <!-- 1. Total Vehicles -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4 slds-m-bottom_small">
+                <div class="metric-card slds-card slds-p-around_medium card-accent-blue">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div>
+                            <div class="metric-number font-bold text-navy">{totalVehicles}</div>
+                            <div class="metric-heading font-semibold slds-m-top_xx-small">Total Vehicles</div>
+                            <div class="metric-caption slds-text-color_weak slds-m-top_xxx-small">Across all dealerships</div>
+                        </div>
+                        <div class="metric-icon-box bg-blue-subtle">
+                            <lightning-icon icon-name="custom:custom31" size="medium" alternative-text="Vehicles"></lightning-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Available Units -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4 slds-m-bottom_small">
+                <div class="metric-card slds-card slds-p-around_medium card-accent-green">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div>
+                            <div class="metric-number font-bold text-success">{availableUnits}</div>
+                            <div class="metric-heading font-semibold slds-m-top_xx-small">Available Units</div>
+                            <div class="metric-caption slds-text-color_weak slds-m-top_xxx-small">Illustrative inventory metric</div>
+                        </div>
+                        <div class="metric-icon-box bg-green-subtle">
+                            <lightning-icon icon-name="standard:product_item" size="medium" alternative-text="Inventory"></lightning-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Pending Orders -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4 slds-m-bottom_small">
+                <div class="metric-card slds-card slds-p-around_medium card-accent-amber">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div>
+                            <div class="metric-number font-bold text-amber">{pendingOrders}</div>
+                            <div class="metric-heading font-semibold slds-m-top_xx-small">Pending Orders</div>
+                            <div class="metric-caption slds-text-color_weak slds-m-top_xxx-small">Awaiting confirmation</div>
+                        </div>
+                        <div class="metric-icon-box bg-amber-subtle">
+                            <lightning-icon icon-name="standard:orders" size="medium" alternative-text="Orders"></lightning-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Customers -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4 slds-m-bottom_small">
+                <div class="metric-card slds-card slds-p-around_medium card-accent-purple">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div>
+                            <div class="metric-number font-bold text-purple">{totalCustomers}</div>
+                            <div class="metric-heading font-semibold slds-m-top_xx-small">Customers</div>
+                            <div class="metric-caption slds-text-color_weak slds-m-top_xxx-small">Registered customers</div>
+                        </div>
+                        <div class="metric-icon-box bg-purple-subtle">
+                            <lightning-icon icon-name="standard:contact" size="medium" alternative-text="Customers"></lightning-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Body: Two-Column Responsive Layout -->
+        <div class="slds-grid slds-wrap slds-gutters">
+            <!-- Left Column: Inventory Metrics & Low Stock Alerts -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_7-of-12">
+                <!-- Inventory Monitoring LWC Component -->
+                <div class="slds-m-bottom_medium">
+                    <c-inventory-metrics inventory-data={inventoryList}></c-inventory-metrics>
+                </div>
+
+                <!-- Low Stock Alerts LWC Component -->
+                <div class="slds-m-bottom_medium">
+                    <c-low-stock-alerts alerts={alertsList}></c-low-stock-alerts>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Analytics & Dealer Performance -->
+            <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+                <!-- Order Analytics LWC Component -->
+                <div class="slds-m-bottom_medium">
+                    <c-order-analytics analytics-data={orderAnalyticsData}></c-order-analytics>
+                </div>
+
+                <!-- Dealer Performance LWC Component -->
+                <div class="slds-m-bottom_medium">
+                    <c-dealer-performance dealers-data={dealersList}></c-dealer-performance>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

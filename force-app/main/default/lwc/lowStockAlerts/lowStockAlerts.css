@@ -1,0 +1,40 @@
+.alert-row {
+    border-radius: 6px;
+    border-left: 4px solid;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.alert-critical {
+    background-color: #fef1f2;
+    border-left-color: #ea001e;
+}
+
+.alert-warning {
+    background-color: #fff9ea;
+    border-left-color: #fe9339;
+}
+
+.vehicle-alert-title {
+    color: #032d60;
+    font-size: 0.95rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.stock-pill {
+    padding: 4px 10px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #c9c7c5;
+    white-space: nowrap;
+}
+
+.text-healthy {
+    color: #2e844a;
+}

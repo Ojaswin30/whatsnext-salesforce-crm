@@ -10,6 +10,7 @@
     <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
     <label>Vehicle Order Management</label>
     <navType>Standard</navType>
+    <tabs>Vehicle_Operations_Dashboard</tabs>
     <tabs>Vehicle__c</tabs>
     <tabs>Vehicle_Dealer__c</tabs>
     <tabs>Vehicle_Order__c</tabs>

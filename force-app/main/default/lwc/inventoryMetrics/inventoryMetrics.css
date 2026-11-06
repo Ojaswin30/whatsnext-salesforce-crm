@@ -1,0 +1,17 @@
+.inventory-item:last-child {
+    border-bottom: none;
+}
+
+.vehicle-title {
+    font-weight: 600;
+    color: #032d60;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.unit-count {
+    min-width: 70px;
+    text-align: right;
+}

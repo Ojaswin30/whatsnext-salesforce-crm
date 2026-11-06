@@ -2,7 +2,8 @@
 
 [![Salesforce CRM CI Validation](https://github.com/Ojaswin30/whatsnext-salesforce-crm/actions/workflows/salesforce-ci.yml/badge.svg)](https://github.com/Ojaswin30/whatsnext-salesforce-crm/actions/workflows/salesforce-ci.yml)
 [![Salesforce DX](https://img.shields.io/badge/Salesforce-DX%20v60.0-00A1E0?logo=salesforce)](https://developer.salesforce.com/tools/sfdxcli)
-[![Apex Tests Passed](https://img.shields.io/badge/Apex%20Tests-19%2F19%20Passed%20(100%25)-brightgreen)](force-app/main/default/classes/)
+[![Apex Tests Passed](https://img.shields.io/badge/Apex%20Tests-25%2F25%20Passed%20(100%25)-brightgreen)](force-app/main/default/classes/)
+[![Lightning Web Components](https://img.shields.io/badge/LWC-5%20Components%20%7C%20SLDS-00A1E0?logo=salesforce)](force-app/main/default/lwc/)
 [![Apex Best Practices](https://img.shields.io/badge/Apex-Enterprise%20Patterns-blueviolet)](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -33,12 +34,13 @@ Built with **Salesforce DX**, adhering to **Salesforce Governor Limit Best Pract
 7. [Inventory Management Design & Concurrency Protection](#7-inventory-management-design--concurrency-protection)
 8. [Batch and Scheduled Apex Architecture](#8-batch-and-scheduled-apex-architecture)
 9. [Salesforce Flow Automation](#9-salesforce-flow-automation)
-10. [Security Model & Secret Hygiene](#10-security-model--secret-hygiene)
-11. [Enterprise Test Strategy & Verified Coverage](#11-enterprise-test-strategy--verified-coverage)
-12. [Setup, Deployment & Developer Workflow](#12-setup-deployment--developer-workflow)
-13. [Screenshots & Demonstration Video](#13-screenshots--demonstration-video)
-14. [Known Platform Limitations & Technical Roadmap](#14-known-platform-limitations--technical-roadmap)
-15. [Salesforce AMTS Alignment & Technical Interview Guide](#15-salesforce-amts-alignment--technical-interview-guide)
+10. [Custom Lightning Operations Dashboard (LWC)](#10-custom-lightning-operations-dashboard-lwc)
+11. [Security Model & Secret Hygiene](#11-security-model--secret-hygiene)
+12. [Enterprise Test Strategy & Verified Coverage](#12-enterprise-test-strategy--verified-coverage)
+13. [Setup, Deployment & Developer Workflow](#13-setup-deployment--developer-workflow)
+14. [Screenshots & Demonstration Video](#14-screenshots--demonstration-video)
+15. [Known Platform Limitations & Technical Roadmap](#15-known-platform-limitations--technical-roadmap)
+16. [Salesforce AMTS Alignment & Technical Interview Guide](#16-salesforce-amts-alignment--technical-interview-guide)
 
 ---
 
@@ -51,6 +53,7 @@ This repository houses the full Salesforce application configured as a standard 
 - Reusable custom tabs with standard automotive CRM motifs.
 - An authoritative, bulkified **Apex Trigger Handler and Domain Service Architecture** for atomic inventory management.
 - Asynchronous **Batch and Scheduled Apex** to process backlogged pending orders FIFO without overselling or duplicate deductions.
+- A **Custom Lightning Operations Dashboard (LWC)** with modular subcomponents for physical inventory monitoring, order status distribution, depleted stock alerts, and dealer performance.
 - Record-Triggered Flows for proximity-based dealer routing and automated customer notifications.
 - A comprehensive test suite with centralized data factory validating positive, negative, and 200-record bulk edge cases.
 - Continuous Integration pipeline running static analysis (Salesforce Code Analyzer / PMD) and dry-run deployment validations.
@@ -79,6 +82,8 @@ This project solves these challenges with architectural rigor, ensuring 100% dat
 - **Programmatic Pre-Reservation Validation**: Provides `VehicleInventoryService.verifyStockAvailability(Id vehicleId, Integer requestedUnits)` which enforces strict inventory verification and raises domain-specific `VehicleInventoryException` for out-of-stock or discontinued models.
 - **Bulk Safe & Governor-Limit Compliant**: Fully bulkified to process up to 200 records per trigger execution using in-memory allocation tracking and `Map<Id, SObject>` DML collections to prevent duplicate record exceptions.
 - **FIFO Batch Order Confirmation**: Nightly scheduled batch scans backlog pending orders and advances eligible orders to confirmed status as stock is replenished, delegating stock updates to the trigger handler to guarantee single-point deduction.
+- **Dealership Operations Dashboard (LWC)**: Real-time custom Lightning dashboard presenting critical executive metrics (*Total Vehicles, Available Units, Pending Orders, Registered Customers*), stock breakdown by model, depleted inventory notifications, order lifecycle analytics, and dealer performance rankings.
+- **Modular Component Architecture**: Decoupled, reusable Lightning Web Components (`vehicleDashboard`, `inventoryMetrics`, `orderAnalytics`, `lowStockAlerts`, `dealerPerformance`) usable collectively or embedded standalone across App, Record, or Home pages.
 - **Proximity Dealer Assignment**: Automated record-triggered flow routing orders to the closest authorized dealer based on customer geography.
 - **Test-Drive & Service Request Tracking**: Low-code automation managing appointment schedules and customer communication.
 
@@ -330,7 +335,68 @@ Low-code declarative automation complements programmatic business logic:
 
 ---
 
-## 10. Security Model & Secret Hygiene
+## 10. Custom Lightning Operations Dashboard (LWC)
+
+To replace standard record views with an enterprise command center, Phase 3 implements a custom **Dealership Operations Dashboard** using **Lightning Web Components (LWC)** and **Salesforce Lightning Design System (SLDS)**.
+
+```mermaid
+graph TD
+    Dashboard["VehicleDashboard (Container LWC)"]
+    Controller["VehicleDashboardController (Apex @AuraEnabled)"]
+    DB[("Salesforce Database")]
+
+    Dashboard -->|"@wire / refreshApex()"| Controller
+    Controller -->|"SOQL Aggregations"| DB
+
+    Dashboard --> M1["Top Summary Metric Cards<br/>(Total Vehicles | Available Units | Pending Orders | Customers)"]
+    Dashboard --> C1["c-inventory-metrics<br/>• Model Breakdown (Nexon, Harrier, etc.)<br/>• Body Style Filtering (SUV, EV, Sedan)<br/>• SLDS Fill Progress Bars"]
+    Dashboard --> C2["c-low-stock-alerts<br/>• Out-of-Stock Warnings (0 Units)<br/>• Critical Alerts (≤ 3 Units)<br/>• Reorder & Dealership Tags"]
+    Dashboard --> C3["c-order-analytics<br/>• Lifecycle Status Distribution<br/>• Percentage Breakdown<br/>• Recent Transaction Feed"]
+    Dashboard --> C4["c-dealer-performance<br/>• Dealership Stock Volume<br/>• Regional Allocation<br/>• Order Fulfillment Tracking"]
+```
+
+### Component Architecture & Responsibilities
+
+| Component | Architecture & Key Responsibilities |
+| :--- | :--- |
+| **`vehicleDashboard`** | **Master Dashboard Container**: Renders the executive header (*WhatsNext Vision Motors*), the top 4 metric summary cards, the live data refresh action (`refreshApex`), and coordinates data flow across child components. |
+| **`inventoryMetrics`** | **Stock & Availability Monitoring**: Displays vehicle inventory counts (e.g., Nexon: 5 units, Harrier: 3 units, Punch: 8 units, Safari: 2 units, Altroz: 4 units), with SLDS progress bars, body style category filters (All, SUV, EV, Sedan), and stock status badges. |
+| **`orderAnalytics`** | **Order Lifecycle Analytics**: Visualizes the order distribution across `Pending`, `Confirmed`, `Delivered`, and `Cancelled` states, accompanied by a recent transactions feed. |
+| **`lowStockAlerts`** | **Inventory Notification Feed**: Detects critical inventory depletion ($\le 3$ units) and out-of-stock items, displaying severity-coded badges (`critical` / `warning`) and dealer contact routing. |
+| **`dealerPerformance`** | **Dealer-Wise Operations**: Aggregates vehicle allocation, physical unit counts, and order activity across authorized regional dealership partners. |
+
+### Dual-Mode Reusability Pattern
+Each subcomponent implements an `@api` property setter pattern paired with an independent `@wire` fallback:
+```javascript
+// Example from inventoryMetrics.js
+@api 
+get inventoryData() { return this._rawInventory; }
+set inventoryData(value) {
+    if (value) {
+        this._rawInventory = value;
+        this.processItems(value);
+        this.isLoading = false;
+    }
+}
+
+// Fallback wire allows standalone placement on Record or Home pages
+@wire(getInventoryMetrics)
+wiredInventory({ error, data }) {
+    if (!this._rawInventory || this._rawInventory.length === 0) {
+        if (data) { this.processItems(data); this.isLoading = false; }
+    }
+}
+```
+
+### Lightning App Builder Activation (Step 13)
+The dashboard is accessible directly via the **Vehicle Order Management** application:
+1. **App Page**: `Vehicle Operations Dashboard` (`Vehicle_Operations_Dashboard.flexipage-meta.xml`).
+2. **Custom Tab**: `Vehicle_Operations_Dashboard.tab-meta.xml` with `Custom95: Gauge` motif.
+3. **Application Navigation**: Pinned as the primary default tab in `Vehicle_Order_Management.app-meta.xml`.
+
+---
+
+## 11. Security Model & Secret Hygiene
 
 ### Secret Sanitization Verification
 - **Zero Hardcoded Credentials**: The repository is completely sanitized. No passwords, private keys, API keys, session tokens, or JWTs exist in code, scripts, configuration, or commit history.
@@ -340,22 +406,22 @@ Low-code declarative automation complements programmatic business logic:
 ### Access Control & Sharing
 - **Sharing Architecture**: Apex classes enforce `with sharing` to respect user record-level permissions.
 - **Permission Sets**:
-  - `WhatsNext_Vehicle_Manager`: Grants Create, Read, Edit, Delete, View All, and Modify All permissions across all six custom objects and visibility on all custom navigation tabs.
+  - `WhatsNext_Vehicle_Manager`: Grants Create, Read, Edit, Delete, View All, and Modify All permissions across all six custom objects, access to `VehicleDashboardController`, and visibility on all custom navigation tabs including the new Operations Dashboard.
 - **Field-Level Security (FLS)**:
   - Critical financial and inventory metrics (`Price__c`, `Stock_Quantity__c`) protected from unauthorized modification.
 
 ---
 
-## 11. Enterprise Test Strategy & Verified Coverage
+## 12. Enterprise Test Strategy & Verified Coverage
 
 The test suite employs the **Test Data Factory Pattern** (`VehicleTestDataFactory`), operates under `@isTest(SeeAllData=false)` isolation, and guarantees governor-limit verification.
 
 ### Test Results in Target Org (`WhatsNextDev`)
-- **Total Components Deployed**: 52/52 (100%)
-- **Total Unit Tests Executed**: 19/19
-- **Passing**: 19 (100%)
+- **Total Components Deployed**: 58+
+- **Total Unit Tests Executed**: 25/25
+- **Passing**: 25 (100%)
 - **Failing**: 0 (0%)
-- **Test Coverage**: Exceeds the 75% platform requirement across all Apex classes.
+- **Test Coverage**: Exceeds the 75% platform requirement across all Apex classes (100% coverage on core service and dashboard controllers).
 
 ### Test Scenarios Implemented
 
@@ -380,10 +446,16 @@ The test suite employs the **Test Data Factory Pattern** (`VehicleTestDataFactor
 | **17** | `testBatchExecution_ConfirmsPendingOrdersWhenStockAvailable` | Verifies `VehicleOrderBatch` executes asynchronously, confirms pending orders, and decrements stock once via trigger. |
 | **18** | `testBatchExecution_LeavesPendingWhenNoStock` | Verifies `VehicleOrderBatch` leaves pending orders intact when stock is zero. |
 | **19** | `testSchedulerExecution_SchedulesSuccessfully` | Verifies `VehicleOrderBatchScheduler` schedules properly and validates CRON trigger expression. |
+| **20** | `testGetDashboardData_ReturnsAggregatedMetrics` | Verifies `VehicleDashboardController.getDashboardData()` calculates live totals, inventory, orders, and alerts. |
+| **21** | `testGetInventoryMetrics_CalculatesPercentagesAndBadges` | Verifies relative inventory percentages, SLDS badge classes, and stock quantities. |
+| **22** | `testGetOrderAnalytics_DistributesStatusesAccurately` | Verifies order counts and percentage distributions across Pending, Confirmed, Delivered, and Cancelled. |
+| **23** | `testGetLowStockAlerts_IdentifiesExhaustedAndLowInventory` | Verifies identification of out-of-stock (0 units) and low-stock ($\le 3$ units) models. |
+| **24** | `testGetDealerPerformance_AggregatesInventoryAndOrdersPerDealer` | Verifies dealer-specific aggregations of assigned models, total stock units, and orders. |
+| **25** | `testEmptyOrg_ResilienceWithoutExceptions` | Verifies dashboard controller returns zero-value wrapper structures without null pointer exceptions when org has 0 records. |
 
 ---
 
-## 12. Setup, Deployment & Developer Workflow
+## 13. Setup, Deployment & Developer Workflow
 
 ### Prerequisites
 - [Salesforce CLI (`sf`)](https://developer.salesforce.com/tools/sfdxcli) installed.
@@ -410,6 +482,7 @@ sf project deploy start \
   --test-level RunSpecifiedTests \
   --tests VehicleOrderTriggerTest \
   --tests VehicleOrderBatchTest \
+  --tests VehicleDashboardControllerTest \
   --wait 30
 ```
 
@@ -425,7 +498,7 @@ sf scanner run --target "force-app/main/default/classes" --pmdconfig "config/pmd
 
 ---
 
-## 13. Screenshots & Demonstration Video
+## 14. Screenshots & Demonstration Video
 
 - **Salesforce Org URL**: [Launch Org](https://orgfarm-b97cdb323c-dev-ed.develop.lightning.force.com/lightning/page/home)
 - **Dealer Assignment Flow**:
@@ -440,7 +513,7 @@ sf scanner run --target "force-app/main/default/classes" --pmdconfig "config/pmd
 
 ---
 
-## 14. Known Platform Limitations & Technical Roadmap
+## 15. Known Platform Limitations & Technical Roadmap
 
 1. **High-Contention Locks on Single Hot Records**:
    - *Limitation*: When thousands of concurrent orders compete for a single high-demand vehicle (e.g., flash sale), `SELECT ... FOR UPDATE` can hold row locks for up to 10 seconds before encountering an `UNABLE_TO_LOCK_ROW` exception.
@@ -453,7 +526,7 @@ sf scanner run --target "force-app/main/default/classes" --pmdconfig "config/pmd
 
 ---
 
-## 15. Salesforce AMTS Alignment & Technical Interview Guide
+## 16. Salesforce AMTS Alignment & Technical Interview Guide
 
 This project was refined to address core software engineering principles evaluated during Salesforce technical interviews (e.g., Associate Member of Technical Staff — Job ID: JR307116):
 

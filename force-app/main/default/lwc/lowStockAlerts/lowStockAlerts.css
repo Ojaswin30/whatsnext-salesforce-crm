@@ -1,7 +1,13 @@
+.alerts-container {
+    max-height: 165px;
+    overflow-y: auto;
+}
+
 .alert-row {
-    border-radius: 6px;
-    border-left: 4px solid;
-    transition: background-color 0.15s ease-in-out;
+    border-radius: 4px;
+    border-left: 3px solid;
+    padding: 3px 6px;
+    margin-bottom: 3px;
 }
 
 .alert-critical {
@@ -16,7 +22,14 @@
 
 .vehicle-alert-title {
     color: #032d60;
-    font-size: 0.95rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+}
+
+.alert-desc {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    margin-top: 1px;
 }
 
 .font-bold {
@@ -27,11 +40,18 @@
     font-weight: 600;
 }
 
+.compact-badge {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    line-height: 1.2;
+}
+
 .stock-pill {
-    padding: 4px 10px;
+    padding: 1px 6px;
     background-color: #ffffff;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid #c9c7c5;
+    font-size: 0.68rem;
     white-space: nowrap;
 }
 

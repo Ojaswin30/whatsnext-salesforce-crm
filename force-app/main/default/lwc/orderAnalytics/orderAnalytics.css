@@ -7,9 +7,29 @@
 }
 
 .metric-mini-card {
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: #fafaf9;
-    border-left-width: 4px;
+    border-left-width: 3px;
+    padding: 3px 6px;
+    text-align: center;
+}
+
+.mini-card-title {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.mini-card-number {
+    font-size: 1.15rem;
+    line-height: 1.1;
+    margin: 1px 0;
+}
+
+.mini-card-pct {
+    font-size: 0.62rem;
+    line-height: 1;
 }
 
 .status-pending {
@@ -42,4 +62,30 @@
 
 .text-cancelled {
     color: #ea001e;
+}
+
+.sub-heading {
+    font-size: 0.68rem;
+    color: #514f4d;
+    letter-spacing: 0.5px;
+}
+
+.orders-table-container {
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.table-th {
+    font-size: 0.68rem;
+    padding: 2px 4px;
+}
+
+.table-td {
+    font-size: 0.72rem;
+    padding: 2px 4px;
+}
+
+.compact-badge {
+    font-size: 0.62rem;
+    padding: 1px 5px;
 }

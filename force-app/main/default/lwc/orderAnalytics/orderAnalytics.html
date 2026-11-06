@@ -1,86 +1,89 @@
 <template>
-    <lightning-card title="Order Status Distribution" icon-name="standard:orders">
+    <lightning-card title="Order Status Distribution" icon-name="standard:orders" class="compact-card">
         <div slot="actions">
-            <span class="slds-badge slds-badge_lightest">Total Orders: {totalOrders}</span>
+            <span class="compact-badge slds-badge slds-badge_lightest">Total Orders: {totalOrders}</span>
         </div>
 
-        <div class="slds-p-around_medium">
+        <div class="slds-p-horizontal_small slds-p-vertical_xx-small">
             <!-- Loading Spinner -->
             <template lwc:if={isLoading}>
-                <div class="slds-is-relative slds-p-vertical_large">
+                <div class="slds-is-relative slds-p-vertical_small">
                     <lightning-spinner alternative-text="Loading order analytics..." size="small"></lightning-spinner>
                 </div>
             </template>
 
             <template lwc:if={hasData}>
-                <!-- Distribution Progress Bars / Tiles -->
-                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <!-- Distribution Mini-Cards (Compact 4-Tile Row) -->
+                <div class="slds-grid slds-wrap slds-gutters_xx-small slds-m-bottom_xx-small">
                     <!-- Pending -->
-                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_x-small">
-                        <div class="metric-mini-card status-pending slds-p-around_small slds-box slds-box_x-small">
-                            <div class="slds-text-title_caps slds-text-color_weak">Pending</div>
-                            <div class="slds-text-heading_medium font-bold text-pending">{pendingCount}</div>
-                            <div class="slds-text-body_small slds-text-color_weak">{pendingPercentage}% of total</div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <div class="metric-mini-card status-pending slds-box slds-box_xx-small">
+                            <div class="mini-card-title text-pending">Pending</div>
+                            <div class="mini-card-number font-bold text-pending">{pendingCount}</div>
+                            <div class="mini-card-pct slds-text-color_weak">{pendingPercentage}%</div>
                         </div>
                     </div>
 
                     <!-- Confirmed -->
-                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_x-small">
-                        <div class="metric-mini-card status-confirmed slds-p-around_small slds-box slds-box_x-small">
-                            <div class="slds-text-title_caps slds-text-color_weak">Confirmed</div>
-                            <div class="slds-text-heading_medium font-bold text-confirmed">{confirmedCount}</div>
-                            <div class="slds-text-body_small slds-text-color_weak">{confirmedPercentage}% of total</div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <div class="metric-mini-card status-confirmed slds-box slds-box_xx-small">
+                            <div class="mini-card-title text-confirmed">Confirmed</div>
+                            <div class="mini-card-number font-bold text-confirmed">{confirmedCount}</div>
+                            <div class="mini-card-pct slds-text-color_weak">{confirmedPercentage}%</div>
                         </div>
                     </div>
 
                     <!-- Delivered -->
-                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_x-small">
-                        <div class="metric-mini-card status-delivered slds-p-around_small slds-box slds-box_x-small">
-                            <div class="slds-text-title_caps slds-text-color_weak">Delivered</div>
-                            <div class="slds-text-heading_medium font-bold text-delivered">{deliveredCount}</div>
-                            <div class="slds-text-body_small slds-text-color_weak">{deliveredPercentage}% of total</div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <div class="metric-mini-card status-delivered slds-box slds-box_xx-small">
+                            <div class="mini-card-title text-delivered">Delivered</div>
+                            <div class="mini-card-number font-bold text-delivered">{deliveredCount}</div>
+                            <div class="mini-card-pct slds-text-color_weak">{deliveredPercentage}%</div>
                         </div>
                     </div>
 
                     <!-- Cancelled -->
-                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_x-small">
-                        <div class="metric-mini-card status-cancelled slds-p-around_small slds-box slds-box_x-small">
-                            <div class="slds-text-title_caps slds-text-color_weak">Cancelled</div>
-                            <div class="slds-text-heading_medium font-bold text-cancelled">{cancelledCount}</div>
-                            <div class="slds-text-body_small slds-text-color_weak">{cancelledPercentage}% of total</div>
+                    <div class="slds-col slds-size_1-of-4">
+                        <div class="metric-mini-card status-cancelled slds-box slds-box_xx-small">
+                            <div class="mini-card-title text-cancelled">Cancelled</div>
+                            <div class="mini-card-number font-bold text-cancelled">{cancelledCount}</div>
+                            <div class="mini-card-pct slds-text-color_weak">{cancelledPercentage}%</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Orders Feed -->
-                <div class="slds-m-top_medium">
-                    <h3 class="slds-text-title_caps slds-m-bottom_small font-semibold">Recent Vehicle Orders</h3>
+                <!-- Recent Orders Feed (Compact Table) -->
+                <div class="recent-orders-wrapper">
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_xxx-small">
+                        <span class="sub-heading font-semibold">RECENT VEHICLE ORDERS</span>
+                    </div>
+
                     <template lwc:if={hasRecentOrders}>
-                        <div class="slds-table_header-hidden">
-                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-no-row-hover">
+                        <div class="orders-table-container">
+                            <table class="slds-table slds-table_compact slds-table_cell-buffer slds-table_bordered slds-no-row-hover">
                                 <thead>
                                     <tr class="slds-line-height_reset">
-                                        <th scope="col"><div class="slds-truncate" title="Order #">Order #</div></th>
-                                        <th scope="col"><div class="slds-truncate" title="Customer">Customer</div></th>
-                                        <th scope="col"><div class="slds-truncate" title="Vehicle">Vehicle</div></th>
-                                        <th scope="col"><div class="slds-truncate" title="Date">Date</div></th>
-                                        <th scope="col"><div class="slds-truncate" title="Status">Status</div></th>
+                                        <th scope="col"><div class="slds-truncate table-th" title="Order #">Order #</div></th>
+                                        <th scope="col"><div class="slds-truncate table-th" title="Customer">Customer</div></th>
+                                        <th scope="col"><div class="slds-truncate table-th" title="Vehicle">Vehicle</div></th>
+                                        <th scope="col"><div class="slds-truncate table-th" title="Date">Date</div></th>
+                                        <th scope="col"><div class="slds-truncate table-th" title="Status">Status</div></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template for:each={recentOrders} for:item="ord">
                                         <tr key={ord.orderId}>
                                             <th scope="row">
-                                                <div class="slds-truncate font-semibold">{ord.orderNumber}</div>
+                                                <div class="slds-truncate table-td font-semibold">{ord.orderNumber}</div>
                                             </th>
                                             <td>
-                                                <div class="slds-truncate">{ord.customerName}</div>
+                                                <div class="slds-truncate table-td">{ord.customerName}</div>
                                             </td>
                                             <td>
-                                                <div class="slds-truncate">{ord.vehicleName}</div>
+                                                <div class="slds-truncate table-td">{ord.vehicleName}</div>
                                             </td>
                                             <td>
-                                                <div class="slds-truncate">
+                                                <div class="slds-truncate table-td">
                                                     <lightning-formatted-date-time 
                                                         value={ord.orderDate} 
                                                         year="numeric" 
@@ -99,17 +102,15 @@
                         </div>
                     </template>
                     <template lwc:else>
-                        <p class="slds-text-color_weak slds-text-align_center slds-p-vertical_small">No recent orders logged.</p>
+                        <p class="slds-text-color_weak slds-text-align_center slds-p-vertical_xx-small table-td">No recent orders logged.</p>
                     </template>
                 </div>
             </template>
 
             <!-- Empty State -->
             <template lwc:if={showEmptyState}>
-                <div class="slds-text-align_center slds-p-vertical_large">
-                    <lightning-icon icon-name="utility:orders" size="medium" alternative-text="No Orders"></lightning-icon>
-                    <p class="slds-text-heading_small slds-m-top_small">No vehicle orders recorded yet.</p>
-                    <p class="slds-text-color_weak">Incoming customer vehicle bookings will be tracked and analyzed here.</p>
+                <div class="slds-text-align_center slds-p-vertical_small">
+                    <p class="slds-text-body_small font-semibold">No vehicle orders recorded yet.</p>
                 </div>
             </template>
         </div>

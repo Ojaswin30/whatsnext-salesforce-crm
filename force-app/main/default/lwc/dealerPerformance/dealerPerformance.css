@@ -1,0 +1,43 @@
+.dealer-table-container {
+    max-height: 165px;
+    overflow-y: auto;
+}
+
+.dealer-title {
+    color: #032d60;
+    font-size: 0.78rem;
+    line-height: 1.2;
+}
+
+.dealer-sub {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    margin-top: 1px;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.table-th {
+    font-size: 0.68rem;
+    padding: 2px 4px;
+}
+
+.table-td {
+    font-size: 0.72rem;
+    padding: 2px 4px;
+}
+
+.compact-badge {
+    font-size: 0.62rem;
+    padding: 1px 5px;
+}
+
+.text-primary {
+    color: #0176d3;
+}

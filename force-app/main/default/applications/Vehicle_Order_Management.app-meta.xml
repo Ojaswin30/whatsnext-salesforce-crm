@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0070D2</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>Enterprise vehicle order, inventory, test-drive, and service request management application.</description>
+    <formFactors>Large</formFactors>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>Vehicle Order Management</label>
+    <navType>Standard</navType>
+    <tabs>Vehicle_Operations_Dashboard</tabs>
+    <tabs>Vehicle__c</tabs>
+    <tabs>Vehicle_Dealer__c</tabs>
+    <tabs>Vehicle_Order__c</tabs>
+    <tabs>Vehicle_Customer__c</tabs>
+    <tabs>Vehicle_Test_Drive__c</tabs>
+    <tabs>Vehicle_Service_Request__c</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>standard-Dashboard</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

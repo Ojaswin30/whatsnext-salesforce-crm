@@ -1,0 +1,74 @@
+<template>
+    <lightning-card title="Dealer Operations & Stock Performance" icon-name="standard:account" class="compact-card">
+        <div slot="actions">
+            <span class="compact-badge slds-badge slds-badge_lightest">{dealersCount} Dealerships</span>
+        </div>
+
+        <div class="slds-p-horizontal_small slds-p-vertical_xx-small">
+            <!-- Loading Spinner -->
+            <template lwc:if={isLoading}>
+                <div class="slds-is-relative slds-p-vertical_small">
+                    <lightning-spinner alternative-text="Loading dealer performance..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Dealers Table (Compact & Scrollable) -->
+            <template lwc:if={hasDealers}>
+                <div class="dealer-table-container">
+                    <table class="slds-table slds-table_compact slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col"><div class="slds-truncate table-th" title="Dealership">Dealership</div></th>
+                                <th scope="col"><div class="slds-truncate table-th" title="Location">Location</div></th>
+                                <th scope="col"><div class="slds-truncate table-th" title="Models">Models</div></th>
+                                <th scope="col"><div class="slds-truncate table-th" title="Stock Units">In Stock</div></th>
+                                <th scope="col"><div class="slds-truncate table-th" title="Orders">Orders</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={dealersList} for:item="dealer">
+                                <tr key={dealer.dealerId}>
+                                    <th scope="row">
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <span class="dealer-title slds-truncate font-bold slds-m-right_xx-small">
+                                                {dealer.dealerName}
+                                            </span>
+                                            <span class="compact-badge slds-badge slds-badge_lightest">{dealer.dealerCode}</span>
+                                        </div>
+                                        <div class="dealer-sub slds-text-color_weak">
+                                            {dealer.email}
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <div class="slds-truncate table-td">
+                                            <lightning-icon icon-name="utility:checkin" size="xx-small" class="slds-m-right_xxx-small"></lightning-icon>
+                                            {dealer.location}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate table-td font-semibold">{dealer.totalVehicles}</div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate">
+                                            <span class="compact-badge slds-badge slds-theme_success">{dealer.totalStockUnits} units</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-truncate table-td font-semibold text-primary">{dealer.totalOrders}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template lwc:if={showEmptyState}>
+                <div class="slds-text-align_center slds-p-vertical_small">
+                    <p class="slds-text-body_small font-semibold">No dealerships registered.</p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

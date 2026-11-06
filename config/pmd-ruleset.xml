@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="WhatsNext Salesforce PMD Ruleset"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+    <description>
+        Standard static analysis ruleset for WhatsNext Vision Motors Apex codebase.
+    </description>
+
+    <!-- Best Practices -->
+    <rule ref="category/apex/bestpractices.xml/ApexUnitTestClassShouldHaveAsserts" />
+    <rule ref="category/apex/bestpractices.xml/ApexUnitTestShouldNotUseSeeAllDataTrue" />
+    <rule ref="category/apex/bestpractices.xml/AvoidGlobalModifier" />
+
+    <!-- Error Prone -->
+    <rule ref="category/apex/errorprone.xml/AvoidDirectAccessTriggerMap" />
+
+    <!-- Performance -->
+    <rule ref="category/apex/performance.xml/AvoidDmlStatementsInLoops" />
+    <rule ref="category/apex/performance.xml/AvoidSoqlInLoops" />
+    <rule ref="category/apex/performance.xml/OperationWithLimitsInLoop" />
+
+    <!-- Security -->
+    <rule ref="category/apex/security.xml/ApexSharingViolations" />
+    <rule ref="category/apex/security.xml/ApexInsecureEndpoint" />
+    <rule ref="category/apex/security.xml/ApexSOQLInjection" />
+</ruleset>

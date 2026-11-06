@@ -1,0 +1,47 @@
+.inventory-list-container {
+    max-height: 195px;
+    overflow-y: auto;
+}
+
+.inventory-item {
+    padding: 3px 0 4px 0;
+}
+
+.inventory-item:last-child {
+    border-bottom: none;
+}
+
+.vehicle-title {
+    color: #032d60;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.dealer-label {
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.unit-count {
+    min-width: 50px;
+    text-align: right;
+    font-size: 0.8rem;
+}
+
+.compact-badge {
+    font-size: 0.62rem;
+    padding: 1px 5px;
+    line-height: 1.2;
+}
+
+.progress-wrapper {
+    margin-top: 2px;
+}

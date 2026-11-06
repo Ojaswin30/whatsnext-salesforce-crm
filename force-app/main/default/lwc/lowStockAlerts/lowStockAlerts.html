@@ -1,0 +1,67 @@
+<template>
+    <lightning-card title="Low Stock & Inventory Alerts" icon-name="standard:service_crew_member" class="compact-card">
+        <div slot="actions">
+            <template lwc:if={hasAlerts}>
+                <span class="slds-badge slds-theme_error compact-badge">{alertCount} Urgent</span>
+            </template>
+            <template lwc:else>
+                <span class="slds-badge slds-theme_success compact-badge">Inventory Healthy</span>
+            </template>
+        </div>
+
+        <div class="slds-p-horizontal_small slds-p-vertical_xx-small">
+            <!-- Loading Spinner -->
+            <template lwc:if={isLoading}>
+                <div class="slds-is-relative slds-p-vertical_small">
+                    <lightning-spinner alternative-text="Checking inventory alerts..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Alerts List (Scrollable if > 3 items) -->
+            <template lwc:if={hasAlerts}>
+                <div class="alerts-container">
+                    <template for:each={alertItems} for:item="alert">
+                        <div key={alert.vehicleId} class={alert.containerClass}>
+                            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-truncate">
+                                    <lightning-icon 
+                                        icon-name={alert.iconName} 
+                                        size="x-small" 
+                                        variant={alert.iconVariant} 
+                                        class="slds-m-right_x-small slds-no-flex">
+                                    </lightning-icon>
+                                    <div class="slds-truncate">
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <span class="vehicle-alert-title font-bold slds-m-right_xx-small">
+                                                {alert.vehicleName}
+                                            </span>
+                                            <span class="compact-badge slds-badge slds-badge_lightest slds-m-right_xx-small">{alert.model}</span>
+                                            <span class={alert.badgeClass}>{alert.severityLabel}</span>
+                                        </div>
+                                        <div class="alert-desc slds-text-color_weak slds-truncate">
+                                            {alert.alertMessage} &bull; <span class="font-semibold">{alert.dealerName}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-no-flex slds-m-left_x-small">
+                                    <div class="stock-pill font-bold">
+                                        {alert.stockQuantity} Left
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Healthy Inventory State (No Alerts) -->
+            <template lwc:if={showHealthyState}>
+                <div class="slds-text-align_center slds-p-vertical_small">
+                    <p class="slds-text-body_small font-semibold text-healthy">
+                        All Vehicle Stock Levels Healthy (≥ 3 units)
+                    </p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

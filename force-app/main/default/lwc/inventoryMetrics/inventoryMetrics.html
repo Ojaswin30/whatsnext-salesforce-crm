@@ -1,0 +1,80 @@
+<template>
+    <lightning-card title="Inventory Monitoring" icon-name="standard:product_item" class="compact-card">
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button 
+                    label="All" 
+                    variant={allButtonVariant} 
+                    onclick={handleFilterAll} 
+                    size="x-small">
+                </lightning-button>
+                <lightning-button 
+                    label="SUV" 
+                    variant={suvButtonVariant} 
+                    onclick={handleFilterSuv} 
+                    size="x-small">
+                </lightning-button>
+                <lightning-button 
+                    label="EV" 
+                    variant={evButtonVariant} 
+                    onclick={handleFilterEv} 
+                    size="x-small">
+                </lightning-button>
+                <lightning-button 
+                    label="Sedan" 
+                    variant={sedanButtonVariant} 
+                    onclick={handleFilterSedan} 
+                    size="x-small">
+                </lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-p-horizontal_small slds-p-vertical_xx-small">
+            <!-- Loading Spinner -->
+            <template lwc:if={isLoading}>
+                <div class="slds-is-relative slds-p-vertical_small">
+                    <lightning-spinner alternative-text="Loading inventory..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Vehicle Inventory List (Scrollable if > 4 items) -->
+            <template lwc:if={hasItems}>
+                <div class="inventory-list-container">
+                    <template for:each={filteredInventory} for:item="item">
+                        <div key={item.vehicleId} class="inventory-item slds-border_bottom">
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-truncate">
+                                    <span class="vehicle-title font-semibold slds-m-right_x-small">{item.vehicleName}</span>
+                                    <span class="compact-badge slds-badge slds-badge_lightest slds-m-right_xx-small">{item.model}</span>
+                                    <span class="dealer-label slds-text-color_weak">({item.dealerName})</span>
+                                </div>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-no-flex">
+                                    <span class="unit-count font-bold slds-m-right_x-small">
+                                        {item.stockQuantity} {item.unitLabel}
+                                    </span>
+                                    <span class={item.badgeClass}>{item.status}</span>
+                                </div>
+                            </div>
+
+                            <!-- Compact Stock Level Bar (size x-small = 4px) -->
+                            <div class="progress-wrapper">
+                                <lightning-progress-bar 
+                                    value={item.percentage} 
+                                    variant={item.progressVariant} 
+                                    size="x-small">
+                                </lightning-progress-bar>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template lwc:if={showEmptyState}>
+                <div class="slds-text-align_center slds-p-vertical_small">
+                    <p class="slds-text-body_small font-semibold">No vehicle inventory records found.</p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

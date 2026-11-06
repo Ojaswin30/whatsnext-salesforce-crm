@@ -1,0 +1,66 @@
+name: Salesforce CRM CI Validation
+
+on:
+  push:
+    branches: [ main, 'enhancement/**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  static-analysis-and-validation:
+    name: Code Quality & Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Validate XML Metadata Well-Formedness
+        run: |
+          python3 -c "
+          import os, xml.etree.ElementTree as ET
+          has_error = False
+          for root, dirs, files in os.walk('.'):
+              if '.git' in root or 'node_modules' in root:
+                  continue
+              for f in files:
+                  if f.endswith('.xml') or f.endswith('-meta.xml'):
+                      path = os.path.join(root, f)
+                      try:
+                          ET.parse(path)
+                      except Exception as e:
+                          print(f'::error file={path}::XML Syntax Error: {e}')
+                          has_error = True
+          if has_error:
+              exit(1)
+          print('All XML metadata files verified well-formed.')
+          "
+
+      - name: Set up Java Runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run PMD Static Analysis
+        uses: pmd/pmd-github-action@v2
+        id: pmd
+        with:
+          version: '6.55.0'
+          rulesets: 'config/pmd-ruleset.xml'
+          sourcePath: 'force-app/main/default/classes'
+          analyzeModifiedFilesOnly: false
+
+      - name: Authenticate and Run Org Validation Deployment (if secret present)
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        if: env.SFDX_AUTH_URL != ''
+        run: |
+          npm install -g @salesforce/cli
+          echo "${SFDX_AUTH_URL}" > ./auth_file.txt
+          sf org login sfdx-url --sfdx-url-file ./auth_file.txt --set-default
+          rm -f ./auth_file.txt
+          sf project deploy validate \
+            --source-dir force-app \
+            --test-level RunLocalTests \
+            --wait 30
